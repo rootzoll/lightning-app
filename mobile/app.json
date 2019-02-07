@@ -6,7 +6,10 @@
     "slug": "lightning-app",
     "privacy": "unlisted",
     "sdkVersion": "32.0.0",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "orientation": "portrait",
     "primaryColor": "#57038D",
     "icon": "./assets/icon.png",
@@ -27,14 +30,23 @@
       "bundleIdentifier": "engineering.lightning.LightningApp",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Lightning to use Face ID"
-      }
+      },
+      "publishBundlePath": "ios/lightning/Supporting/shell-app.bundle",
+      "publishManifestPath": "ios/lightning/Supporting/shell-app-manifest.json"
     },
     "android": {
-      "package": "engineering.lightning.LightningApp"
+      "package": "engineering.lightning.LightningApp",
+      "publishBundlePath": "android/app/src/main/assets/shell-app.bundle",
+      "publishManifestPath": "android/app/src/main/assets/shell-app-manifest.json"
     },
     "packagerOpts": {
       "config": "./rn-cli.config.js"
     },
-    "scheme": "lightning"
+    "scheme": "lightning",
+    "isDetached": true,
+    "detach": {
+      "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v2.10.2-sdk32.0.0-c59c23cd-1d49-49d2-a633-d03f9d554cf6.tar.gz",
+      "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v2.10.5-sdk32.0.0-cfdf42e8-f9b5-4ddd-84fd-2f2aacffe2c1.tar.gz"
+    }
   }
 }
