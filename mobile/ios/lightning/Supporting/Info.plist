@@ -64,6 +64,8 @@
 	<string>Allow Lightning to use your camera</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Allow Lightning to access your contacts</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Allow Lightning to use Face ID</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow Lightning to use your location</string>
 	<key>NSMicrophoneUsageDescription</key>
