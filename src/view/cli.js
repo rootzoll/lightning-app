@@ -69,42 +69,67 @@ class LogOutput extends Component {
     super(props);
     this._refresh = true;
     this._ref = React.createRef();
+    this.state = {
+      maxOffset: undefined,
+    }
   }
 
-  shouldComponentUpdate() {
-    const current = this._refresh;
-    this._refresh = false;
-    setTimeout(() => {
-      this._refresh = true;
-    }, 100);
-    if (!current) {
-      clearTimeout(this._tLast);
-      this._tLast = setTimeout(() => this.forceUpdate(), 500);
-    }
-    return current;
-  }
+//  shouldComponentUpdate() {
+//    const current = this._refresh;
+//    this._refresh = false;
+//    setTimeout(() => {
+//      this._refresh = true;
+//    }, 100);
+//    if (!current) {
+//      clearTimeout(this._tLast);
+//      this._tLast = setTimeout(() => this.forceUpdate(), 500);
+//    }
+//    return current;
+//  }
 
   componentWillUnmount() {
     clearTimeout(this._tLast);
     clearTimeout(this._tScroll);
   }
 
-  get printLogs() {
-    this._tScroll = setTimeout(() => this._ref.current.scrollToEnd(), 50);
-    return this.props.logs;
+  onScroll(scrollEvent) {
+    const offset = scrollEvent.nativeEvent.contentOffset.y;
+//    console.log(`offset: ${offset}, maxOffset: ${this.state.maxOffset}, contentHeight: ${scrollEvent.nativeEvent.contentSize.height}`);
+    if (this.state.maxOffset === undefined || this.state.maxOffset <= offset) {
+      this.setState({ maxOffset: offset - 10 })
+//      console.log("about to set timeout to stay scrolled to the end")
+      if (this._tScroll === undefined) {
+         this._tScroll = setInterval(() => {
+//         console.log("scrolling to end")
+           this._ref.current.scrollToEnd()
+         }, 1000);
+      }
+    } else if (offset < this.state.maxOffset && this._tScroll) {
+//      console.log("clearing timeout for scroll")
+      clearInterval(this._tScroll);
+      this._tScroll = undefined;
+    }
   }
 
   render() {
+      console.log("render called")
     return (
-      <ScrollView ref={this._ref} contentContainerStyle={logStyles.content}>
-        <Text style={logStyles.text}>{this.printLogs}</Text>
+      <ScrollView
+        ref={this._ref}
+        onScroll={event => this.onScroll(event)}
+        scrollEventThrottle={300}
+        contentContainerStyle={logStyles.content}
+      >
+        {this.props.logs.map(log =>
+          <Text style={logStyles.txt}>{log}</Text>
+        )}
       </ScrollView>
     );
   }
 }
 
 LogOutput.propTypes = {
-  logs: PropTypes.string.isRequired,
+  logs: PropTypes.object.isRequired,
 };
 
 export default observer(CLIView);

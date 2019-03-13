@@ -25,7 +25,7 @@ module.exports.DEFAULT_ROUTE = 'Welcome';
 module.exports.PIN_LENGTH = 6;
 module.exports.MIN_PASSWORD_LENGTH = 8;
 module.exports.STRONG_PASSWORD_LENGTH = 12;
-module.exports.MAX_LOG_LENGTH = 10000;
+module.exports.MAX_LOG_LENGTH = 100;
 module.exports.RECOVERY_WINDOW = 250;
 
 module.exports.UNITS = {

@@ -51,10 +51,11 @@ export function error(...args) {
 
 function pushLogs(message) {
   if (!_store) return;
-  _store.logs += '\n' + message.replace(/\s+$/, '');
-  const len = _store.logs.length;
+  const len = _store.logs.push(message);
   if (len > MAX_LOG_LENGTH) {
-    _store.logs = _store.logs.substring(len - MAX_LOG_LENGTH, len);
+    let removed = _store.logs.splice(0, len - MAX_LOG_LENGTH);
+    console.log("removed:");
+    console.log(removed);
   }
 }
 
