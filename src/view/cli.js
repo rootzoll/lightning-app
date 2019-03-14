@@ -69,6 +69,9 @@ class LogOutput extends Component {
     super(props);
     this._refresh = true;
     this._ref = React.createRef();
+    this.state = {
+      maxOffset: undefined,
+    };
   }
 
   shouldComponentUpdate() {
@@ -86,17 +89,37 @@ class LogOutput extends Component {
 
   componentWillUnmount() {
     clearTimeout(this._tLast);
-    clearTimeout(this._tScroll);
+    clearInterval(this._tScroll);
   }
 
   get printLogs() {
-    this._tScroll = setTimeout(() => this._ref.current.scrollToEnd(), 50);
     return this.props.logs;
+  }
+
+  onScroll(scrollEvent) {
+    const offset = scrollEvent.nativeEvent.contentOffset.y;
+    if (this.state.maxOffset === undefined || this.state.maxOffset <= offset) {
+      this.setState({ maxOffset: offset - 10 });
+      if (this._tScroll === undefined) {
+        this._tScroll = setInterval(
+          () => this._ref.current.scrollToEnd(),
+          1000
+        );
+      }
+    } else if (offset < this.state.maxOffset && this._tScroll) {
+      clearInterval(this._tScroll);
+      this._tScroll = undefined;
+    }
   }
 
   render() {
     return (
-      <ScrollView ref={this._ref} contentContainerStyle={logStyles.content}>
+      <ScrollView
+        ref={this._ref}
+        contentContainerStyle={logStyles.content}
+        onScroll={event => this.onScroll(event)}
+        scrollEventThrottle={300}
+      >
         <Text style={logStyles.text}>{this.printLogs}</Text>
       </ScrollView>
     );
