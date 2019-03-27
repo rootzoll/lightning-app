@@ -11,21 +11,19 @@ function getProcessName(binName) {
   return fs.existsSync(filePath) ? filePath : filename;
 }
 
-async function startChildProcess(name, args, logger) {
-  return new Promise((resolve, reject) => {
-    const processName = getProcessName(name);
-    logger.info(`Using ${name} in path ${processName}`);
-    const childProcess = cp.spawn(processName, args);
-    childProcess.stdout.on('data', data => {
-      logger.info(`${name}: ${data}`);
-      resolve(childProcess);
-    });
-    childProcess.stderr.on('data', data => {
-      logger.error(`${name} Error: ${data}`);
-      reject(new Error(data));
-    });
-    childProcess.on('error', reject);
+function startChildProcess(name, args, logger) {
+  console.log(`starting child process: ${name}`)
+  const processName = getProcessName(name);
+  logger.info(`Using ${name} in path ${processName}`);
+  const childProcess = cp.spawn(processName, args, {
+    detached: true,
+    stdio: 'ignore',
   });
+  childProcess.unref();
+  childProcess.on('error', err =>
+    console.log(`Errored in child process: ${err}`)
+  );
+  return childProcess;
 }
 
 function startBlockingProcess(name, args, logger) {
@@ -45,7 +43,7 @@ function startBlockingProcess(name, args, logger) {
   });
 }
 
-module.exports.startLndProcess = async function({
+module.exports.startLndProcess = function({
   isDev,
   lndSettingsDir,
   lndPort,
@@ -59,7 +57,7 @@ module.exports.startLndProcess = async function({
   const processName = 'lnd';
   let args = [
     '--bitcoin.active',
-    '--debuglevel=info',
+    '--debuglevel=debug',
     `--lnddir=${lndSettingsDir}`,
     `--routing.assumechanvalid`,
     '--autopilot.private',
@@ -92,7 +90,7 @@ module.exports.startLndProcess = async function({
   return startChildProcess(processName, args, logger);
 };
 
-module.exports.startBtcdProcess = async function({
+module.exports.startBtcdProcess = function({
   isDev,
   logger,
   btcdSettingsDir,

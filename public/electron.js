@@ -137,7 +137,7 @@ ipcMain.on('lnd-restart-process', async event => {
   lndProcess && lndProcess.kill('SIGINT');
   let restartError;
   try {
-    lndProcess = await startLndProcess({
+    lndProcess = startLndProcess({
       isDev,
       lndSettingsDir,
       lndPort: LND_PORT,
@@ -151,15 +151,15 @@ ipcMain.on('lnd-restart-process', async event => {
   event.sender.send('lnd-restart-error', { restartError });
 });
 
-const startLnd = async () => {
+const startLnd = () => {
   try {
-    btcdProcess = await startBtcdProcess({
+    btcdProcess = startBtcdProcess({
       isDev,
       logger: Logger,
       btcdSettingsDir,
       miningAddress: BTCD_MINING_ADDRESS,
     });
-    lndProcess = await startLndProcess({
+    lndProcess = startLndProcess({
       isDev,
       lndSettingsDir,
       lndPort: LND_PORT,

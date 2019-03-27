@@ -95,8 +95,8 @@ describe('Action Integration Tests', function() {
   let autopilot2;
   let btcdArgs;
 
-  const startLnd = async () => {
-    const lndProcess1Promise = startLndProcess({
+  const startLnd = () => {
+    lndProcess1 = startLndProcess({
       isDev,
       lndSettingsDir: LND_SETTINGS_DIR_1,
       lndPort: LND_PORT_1,
@@ -104,7 +104,7 @@ describe('Action Integration Tests', function() {
       lndRestPort: LND_REST_PORT_1,
       logger,
     });
-    const lndProcess2Promise = startLndProcess({
+    lndProcess2 = startLndProcess({
       isDev,
       lndSettingsDir: LND_SETTINGS_DIR_2,
       lndPort: LND_PORT_2,
@@ -112,9 +112,6 @@ describe('Action Integration Tests', function() {
       lndRestPort: LND_REST_PORT_2,
       logger,
     });
-
-    lndProcess1 = await lndProcess1Promise;
-    lndProcess2 = await lndProcess2Promise;
   };
 
   before(async () => {
@@ -136,12 +133,12 @@ describe('Action Integration Tests', function() {
       btcdSettingsDir: BTCD_SETTINGS_DIR,
       miningAddress: BTCD_MINING_ADDRESS,
     };
-    btcdProcess = await startBtcdProcess(btcdArgs);
+    btcdProcess = startBtcdProcess(btcdArgs);
     await nap(NAP_TIME);
     await retry(() => isPortOpen(BTCD_PORT));
     await mineBlocks({ blocks: 400, logger });
 
-    await startLnd();
+    startLnd();
 
     await grcpClient.init({
       ipcMain: ipcMainStub1,
@@ -239,7 +236,7 @@ describe('Action Integration Tests', function() {
     it('should reset password', async () => {
       lndProcess1.kill('SIGINT');
       lndProcess2.kill('SIGINT');
-      await startLnd();
+      startLnd();
       ipcMainStub1.on('lnd-restart-process', async event => {
         event.sender.send('lnd-restart-error', { restartError: undefined });
       });
@@ -263,7 +260,7 @@ describe('Action Integration Tests', function() {
     it('should unlock wallet with reset password', async () => {
       lndProcess1.kill();
       lndProcess2.kill();
-      await startLnd();
+      startLnd();
 
       store1.walletUnlocked = false;
       await grpc1.initUnlocker();
@@ -292,7 +289,7 @@ describe('Action Integration Tests', function() {
     it('should fund wallet for node1', async () => {
       await killProcess(btcdProcess.pid);
       btcdArgs.miningAddress = store1.walletAddress;
-      btcdProcess = await startBtcdProcess(btcdArgs);
+      btcdProcess = startBtcdProcess(btcdArgs);
       await nap(NAP_TIME);
       await retry(() => isPortOpen(BTCD_PORT));
       await mineAndSync({ blocks: 100 });
